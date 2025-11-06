@@ -1,0 +1,75 @@
+services:
+  api: &main_app
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    # image: fastapi_org:${FASTAPI_ORG_VERSION:-latest}
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      db:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+    environment:
+      FASTAPI_ORG_HOST: 0.0.0.0
+      FASTAPI_ORG_DB_HOST: db
+      FASTAPI_ORG_DB_PORT: 5432
+      FASTAPI_ORG_DB_USER: fastapi_org
+      FASTAPI_ORG_DB_PASS: fastapi_org
+      FASTAPI_ORG_DB_BASE: fastapi_org
+    networks:
+      - fastapi-network
+
+
+  db:
+    image: postgres:alpine
+    environment:
+      POSTGRES_PASSWORD: "fastapi_org"
+      POSTGRES_USER: "fastapi_org"
+      POSTGRES_DB: "fastapi_org"
+    volumes:
+      - fastapi_org-db-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: pg_isready -U fastapi_org
+      interval: 2s
+      timeout: 3s
+      retries: 40
+    networks:
+      - fastapi-network
+
+  migrator:
+    # image: fastapi_org:${FASTAPI_ORG_VERSION:-latest}
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: "no"
+    command: >
+      sh -c "
+        alembic upgrade head
+      "
+    environment:
+      FASTAPI_ORG_DB_HOST: db
+      FASTAPI_ORG_DB_PORT: 5432
+      FASTAPI_ORG_DB_USER: fastapi_org
+      FASTAPI_ORG_DB_PASS: fastapi_org
+      FASTAPI_ORG_DB_BASE: fastapi_org
+      PGPASSWORD: fastapi_org
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - fastapi-network
+
+
+volumes:
+  fastapi_org-db-data:
+    name: fastapi_org-db-data
+
+networks:
+  fastapi-network:
+    name: fastapi_org-network
+    driver: bridge
+    attachable: true
