@@ -1,5 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from fastapi_org.db.base import Base
 from fastapi_org.db.models.organization_activity import OrganizationActivity
@@ -10,9 +10,12 @@ class Activity(Base):
 
     __tablename__ = "activities"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    name = Column(String(100), nullable=False)
-    parent_id = Column(Integer, ForeignKey("activities.id"), nullable=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    name: Mapped[str] = mapped_column(nullable=False)
+    parent_id: Mapped[int | None] = mapped_column(
+        ForeignKey("activities.id"),
+        nullable=True,
+    )
 
     parent = relationship("Activity", remote_side=[id], back_populates="children")
     children = relationship("Activity", back_populates="parent")

@@ -1,8 +1,8 @@
 """init.
 
-Revision ID: c1e5c5efd868
+Revision ID: d9aa3116c96e
 Revises:
-Create Date: 2025-11-07 09:28:17.434747
+Create Date: 2025-11-07 11:09:03.706586
 
 """
 
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "c1e5c5efd868"
+revision = "d9aa3116c96e"
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -22,7 +22,7 @@ def upgrade() -> None:
     op.create_table(
         "activities",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("name", sa.String(length=100), nullable=False),
+        sa.Column("name", sa.String(), nullable=False),
         sa.Column("parent_id", sa.Integer(), nullable=True),
         sa.ForeignKeyConstraint(
             ["parent_id"],
@@ -33,7 +33,7 @@ def upgrade() -> None:
     op.create_table(
         "buildings",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("address", sa.String(length=255), nullable=False),
+        sa.Column("address", sa.String(), nullable=False),
         sa.Column("latitude", sa.Float(), nullable=False),
         sa.Column("longitude", sa.Float(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
@@ -42,7 +42,7 @@ def upgrade() -> None:
     op.create_table(
         "organizations",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("name", sa.String(length=255), nullable=False),
+        sa.Column("name", sa.String(), nullable=False),
         sa.Column("building_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["building_id"],
@@ -66,7 +66,7 @@ def upgrade() -> None:
     op.create_table(
         "phone_numbers",
         sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
-        sa.Column("phone_number", sa.String(length=20), nullable=False),
+        sa.Column("phone_number", sa.String(), nullable=False),
         sa.Column("organization_id", sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
             ["organization_id"],

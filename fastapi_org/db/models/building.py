@@ -1,5 +1,4 @@
-from sqlalchemy import Column, Float, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from fastapi_org.db.base import Base
 
@@ -9,9 +8,9 @@ class Building(Base):
 
     __tablename__ = "buildings"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    address = Column(String(255), nullable=False, unique=True)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    address: Mapped[str] = mapped_column(nullable=False, unique=True)
+    latitude: Mapped[float] = mapped_column(nullable=False)
+    longitude: Mapped[float] = mapped_column(nullable=False)
 
     organizations = relationship("Organization", back_populates="building")

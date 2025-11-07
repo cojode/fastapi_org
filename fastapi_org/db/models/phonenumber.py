@@ -1,5 +1,5 @@
-from sqlalchemy import Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from fastapi_org.db.base import Base
 
@@ -9,8 +9,11 @@ class PhoneNumber(Base):
 
     __tablename__ = "phone_numbers"
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    phone_number = Column(String(20), nullable=False)
-    organization_id = Column(Integer, ForeignKey("organizations.id"), nullable=False)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    phone_number: Mapped[str] = mapped_column(nullable=False)
+    organization_id: Mapped[int] = mapped_column(
+        ForeignKey("organizations.id"),
+        nullable=False,
+    )
 
     organization = relationship("Organization", back_populates="phone_numbers")
