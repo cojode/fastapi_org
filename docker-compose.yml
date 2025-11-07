@@ -57,6 +57,8 @@ services:
       FASTAPI_ORG_DB_PASS: fastapi_org
       FASTAPI_ORG_DB_BASE: fastapi_org
       PGPASSWORD: fastapi_org
+    volumes:
+      - ./fastapi_org/db/migrations/versions/:/app/src/fastapi_org/db/migrations/versions/
     depends_on:
       db:
         condition: service_healthy

@@ -10,14 +10,14 @@ repos:
             entry: poetry run black
             language: system
             types: [python]
-
+  
           - id: ruff
             name: Check with Ruff
             entry: poetry run ruff
             language: system
             pass_filenames: false
             always_run: true
-            args: ["check", "fastapi_org", "tests", "--fix"]
+            args: ["check", "fastapi_org", "tests", "--fix", "--unsafe-fixes"]
 
           - id: mypy
             name: Validate types with MyPy
