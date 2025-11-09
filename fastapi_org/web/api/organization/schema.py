@@ -1,26 +1,24 @@
+from dataclasses import fields
+
 from fastapi import Query
 from fastapi.exceptions import RequestValidationError
-from dataclasses import fields
-from fastapi_org.web.api.schema import GenericResponse, GenericListResponse
-
-from fastapi_org.domain.organization import (
-    Organization,
-    RectLocation,
-    CircleLocation,
-    LocationShape,
-)
-
 from pydantic import (
     BaseModel,
-    PositiveInt,
-    model_validator,
     Field,
+    PositiveInt,
     ValidationError,
+    model_validator,
 )
-
 from pydantic_core import PydanticCustomError
 
-from fastapi_org.domain.organization import SupportedShapedLocations
+from fastapi_org.domain.organization import (
+    CircleLocation,
+    LocationShape,
+    Organization,
+    RectLocation,
+    SupportedShapedLocations,
+)
+from fastapi_org.web.api.schema import GenericListResponse, GenericResponse
 
 
 class SearchOrganizationsParams(BaseModel):
@@ -69,24 +67,20 @@ class SearchOrganizationsParams(BaseModel):
             case None:
                 ...
             case _:
-                raise ValueError(
-                    f"Unknown location shape: {self.location_shape}"
-                )
+                raise ValueError(f"Unknown location shape: {self.location_shape}")
         return self
 
 
 def get_search_params(
-    organization_name: str | None = Query(
-        None, description="Organization name"
-    ),
+    organization_name: str | None = Query(None, description="Organization name"),
     building_id: int | None = Query(
-        None, gt=0, description="Building ID (must be a positive integer)"
+        None, gt=0, description="Building ID (must be a positive integer)",
     ),
     activity_id: int | None = Query(
-        None, gt=0, description="Activity ID (must be a positive integer)"
+        None, gt=0, description="Activity ID (must be a positive integer)",
     ),
     recursive_activity: bool = Query(
-        False, description="Include nested activities if True"
+        False, description="Include nested activities if True",
     ),
     location_shape: LocationShape | None = Query(
         None,

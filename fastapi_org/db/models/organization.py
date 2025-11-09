@@ -3,8 +3,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from fastapi_org.db.base import Base
 from fastapi_org.db.models.organization_activity import OrganizationActivity
-
 from fastapi_org.domain.organization import Organization as DomainOrganization
+
 
 class Organization(Base):
     """Organization model."""
@@ -13,9 +13,7 @@ class Organization(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(nullable=False)
-    building_id: Mapped[int] = mapped_column(
-        ForeignKey("buildings.id"), nullable=False
-    )
+    building_id: Mapped[int] = mapped_column(ForeignKey("buildings.id"), nullable=False)
 
     building = relationship("Building", back_populates="organizations")
 

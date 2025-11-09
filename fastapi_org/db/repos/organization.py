@@ -1,26 +1,24 @@
+from sqlalchemy import and_, exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, and_, exists
 from sqlalchemy.orm import joinedload
 
+from fastapi_org.db.models.activity import Activity
+from fastapi_org.db.models.organization import Organization
+from fastapi_org.db.models.organization_activity import OrganizationActivity
 from fastapi_org.domain.organization import (
     OrganizaitonRepository,
-    Organization as DomainOrganization,
     ShapedLocation,
 )
+from fastapi_org.domain.organization import (
+    Organization as DomainOrganization,
+)
 
-from fastapi_org.db.models.organization import Organization
-from fastapi_org.db.models.activity import Activity
-from fastapi_org.db.models.organization_activity import OrganizationActivity
 
 class SQLAlchemyOrganizationRepository(OrganizaitonRepository):
     """SQLAlchemy implementation of the OrganizationRepository."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
-
-    async def _execute_and_wrap(self, stmt) -> list[DomainOrganization]:
-        result = await self.session.execute(stmt)
-        return [org.to_domain() for org in result.scalars().unique().all()]
 
     async def get_by_id(
         self, organization_id: int
@@ -35,7 +33,7 @@ class SQLAlchemyOrganizationRepository(OrganizaitonRepository):
             .where(Organization.id == organization_id)
         )
         result = await self.session.execute(stmt)
-        model = result.scalar_one_or_none()
+        model = result.unique().scalar_one_or_none()
         return model.to_domain() if model else None
 
     async def search(
@@ -70,8 +68,9 @@ class SQLAlchemyOrganizationRepository(OrganizaitonRepository):
             )
             activity_tree = activity_tree.union_all(
                 select(Activity.id).join(
-                    activity_tree, Activity.parent_id == activity_tree.c.id
-                )
+                    activity_tree,
+                    Activity.parent_id == activity_tree.c.id,
+                ),
             )
 
             activity_filter = (
@@ -81,12 +80,14 @@ class SQLAlchemyOrganizationRepository(OrganizaitonRepository):
                 )
                 .where(
                     OrganizationActivity.c.activity_id.in_(
-                        select(activity_tree.c.id)
-                        if recursive_activity
-                        else select(Activity.id).where(
-                            Activity.id == activity_id
-                        )
-                    )
+                        (
+                            select(activity_tree.c.id)
+                            if recursive_activity
+                            else select(Activity.id).where(
+                                Activity.id == activity_id
+                            )
+                        ),
+                    ),
                 )
             )
 

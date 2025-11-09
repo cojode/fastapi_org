@@ -4,9 +4,8 @@ from typing import AsyncGenerator
 from fastapi import FastAPI
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from fastapi_org.settings import settings
-
 from fastapi_org.db.models import load_all_models
+from fastapi_org.settings import settings
 
 
 def _setup_db(app: FastAPI) -> None:  # pragma: no cover

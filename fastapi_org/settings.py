@@ -46,6 +46,8 @@ class Settings(BaseSettings):
     db_base: str = "admin"
     db_echo: bool = False
 
+    api_key: str = "defaultapikey"
+
     @property
     def db_url(self) -> URL:
         """

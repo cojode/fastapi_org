@@ -1,12 +1,10 @@
-from fastapi import status
-from fastapi.responses import JSONResponse
 
 from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    field_validator,
     ValidationError,
+    field_validator,
 )
 
 from fastapi_org.exceptions import NotFoundError
@@ -32,7 +30,7 @@ class GenericResponse[T](GenericResponseMessageField):
             if len(v) == 1:
                 return v[0]
             raise ValidationError(
-                "Response expected to have a single item, but more were provided."
+                "Response expected to have a single item, but more were provided.",
             )
         return v
 

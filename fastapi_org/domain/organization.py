@@ -1,9 +1,8 @@
+import math
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Protocol, Callable
-
-import math
+from typing import Any, Protocol
 
 
 class LocationShape(str, Enum):
@@ -25,15 +24,13 @@ class CircleLocation(ShapedLocation):
     @property
     def to_sql_params(self) -> tuple[str, dict[str, Any]]:
         lat_margin = self.radius / 111.0
-        lon_margin = self.radius / (
-            111.0 * math.cos(math.radians(self.center_la))
-        )
+        lon_margin = self.radius / (111.0 * math.cos(math.radians(self.center_la)))
 
         sql = """
             (b.latitude BETWEEN :min_lat AND :max_lat)
             AND (b.longitude BETWEEN :min_lon AND :max_lon)
             AND (
-                POW((b.latitude - :center_la) * 111.0, 2) + 
+                POW((b.latitude - :center_la) * 111.0, 2) +
                 POW((b.longitude - :center_lo) * 111.0 * COS(RADIANS(:center_la)), 2)
             ) <= POW(:radius, 2)
         """
@@ -81,6 +78,7 @@ class RectLocation(ShapedLocation):
 
 
 SupportedShapedLocations = CircleLocation | RectLocation
+
 
 @dataclass
 class Organization:

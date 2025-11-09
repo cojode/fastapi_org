@@ -1,4 +1,4 @@
-from typing import Protocol, runtime_checkable, TypeVar
+from typing import Protocol, TypeVar, runtime_checkable
 
 T = TypeVar("T", covariant=True)
 

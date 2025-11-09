@@ -1,9 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.responses import UJSONResponse
 
+from fastapi_org.__version__ import __version__
 from fastapi_org.web.api.router import api_router
 from fastapi_org.web.lifespan import lifespan_setup
-from fastapi_org.__version__ import __version__
+
+from fastapi_org.dependency import verify_api_key
 
 
 def get_app() -> FastAPI:
@@ -22,6 +24,7 @@ def get_app() -> FastAPI:
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
         default_response_class=UJSONResponse,
+        dependencies=[Depends(verify_api_key)],
     )
 
     app.include_router(router=api_router, prefix="/api")
