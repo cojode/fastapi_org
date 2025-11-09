@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from fastapi_org.db.base import Base
@@ -14,3 +16,11 @@ class Building(Base):
     longitude: Mapped[float] = mapped_column(nullable=False)
 
     organizations = relationship("Organization", back_populates="building")
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "id": self.id,
+            "address": self.address,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+        }

@@ -6,6 +6,8 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from fastapi_org.settings import settings
 
+from fastapi_org.db.models import load_all_models
+
 
 def _setup_db(app: FastAPI) -> None:  # pragma: no cover
     """
@@ -42,6 +44,7 @@ async def lifespan_setup(
 
     app.middleware_stack = None
     _setup_db(app)
+    load_all_models()
     app.middleware_stack = app.build_middleware_stack()
 
     yield

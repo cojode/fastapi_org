@@ -1,10 +1,5 @@
-class RepositoryError(Exception):
-    """Repository layer related error."""
+from fastapi import HTTPException, status
 
-
-class DomainError(Exception):
-    """Domain layer related error."""
-
-
-class NotFoundError(DomainError):
-    """Singular enitity expected but not found error."""
+NotFoundError = HTTPException(
+    status_code=status.HTTP_404_NOT_FOUND,
+)
