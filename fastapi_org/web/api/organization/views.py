@@ -10,15 +10,15 @@ from fastapi_org.web.api.organization.schema import (
     MultipleOrganizationResponse,
     SearchOrganizationsParams,
     SingleOrganizationResponse,
-    get_search_params,
 )
+from fastapi_org.web.api.organization.dependency import get_search_org_params
 
 router = APIRouter()
 
 
 @router.get("", response_model=MultipleOrganizationResponse)
 async def search_org(
-    params: SearchOrganizationsParams = Depends(get_search_params),
+    params: SearchOrganizationsParams = Depends(get_search_org_params),
     use_case: OrganizationUseCase = Depends(get_search_organizations_use_case),
 ):
     return MultipleOrganizationResponse(values=await use_case.execute(params))

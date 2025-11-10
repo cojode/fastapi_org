@@ -4,6 +4,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from fastapi_org.db.base import Base
 
+from fastapi_org.domain.building import Building as DomainBuilding
+
 
 class Building(Base):
     """Building model."""
@@ -24,3 +26,12 @@ class Building(Base):
             "latitude": self.latitude,
             "longitude": self.longitude,
         }
+
+    def to_domain(self) -> DomainBuilding:
+        return DomainBuilding(
+            id=self.id,
+            address=self.address,
+            latitude=self.latitude,
+            longitude=self.longitude,
+            organizations=[org.to_dict() for org in self.organizations],
+        )

@@ -7,10 +7,10 @@ from fastapi_org.db.models.organization import Organization
 from fastapi_org.db.models.organization_activity import OrganizationActivity
 from fastapi_org.domain.organization import (
     OrganizaitonRepository,
-    ShapedLocation,
 )
+from fastapi_org.domain.organization import Organization as DomainOrganization
 from fastapi_org.domain.organization import (
-    Organization as DomainOrganization,
+    ShapedLocation,
 )
 
 

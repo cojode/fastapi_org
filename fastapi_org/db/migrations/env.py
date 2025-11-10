@@ -4,6 +4,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy.ext.asyncio.engine import create_async_engine
 from sqlalchemy.future import Connection
+
 from fastapi_org.db.meta import meta
 from fastapi_org.db.models import load_all_models
 from fastapi_org.settings import settings

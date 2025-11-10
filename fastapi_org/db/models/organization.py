@@ -25,6 +25,12 @@ class Organization(Base):
 
     phone_numbers = relationship("PhoneNumber", back_populates="organization")
 
+    def to_dict(self) -> dict:
+        return {
+            "id": self.id,
+            "name": self.name,
+        }
+
     def to_domain(self) -> DomainOrganization:
         return DomainOrganization(
             id=self.id,
