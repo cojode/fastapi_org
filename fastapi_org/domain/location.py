@@ -1,8 +1,7 @@
 import math
-from enum import Enum
 from dataclasses import dataclass
-
-from typing import Protocol, Any
+from enum import Enum
+from typing import Any, Protocol
 
 
 class LocationShape(str, Enum):

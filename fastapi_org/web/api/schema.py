@@ -1,3 +1,5 @@
+from dataclasses import fields
+
 from pydantic import (
     BaseModel,
     ConfigDict,
@@ -6,19 +8,14 @@ from pydantic import (
     field_validator,
     model_validator,
 )
-
-from dataclasses import fields
-
 from pydantic_core import PydanticCustomError
 
 from fastapi_org.domain.location import (
-    LocationShape,
     CircleLocation,
+    LocationShape,
     RectLocation,
     SupportedShapedLocations,
 )
-
-
 from fastapi_org.exceptions import NotFoundError
 
 

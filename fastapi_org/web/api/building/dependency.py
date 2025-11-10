@@ -1,8 +1,9 @@
-from fastapi_org.web.api.dependency import LocationParams
-from fastapi_org.web.api.building.schema import SearchBuildingsParams
-from pydantic import ValidationError
 from fastapi import Depends
 from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
+
+from fastapi_org.web.api.building.schema import SearchBuildingsParams
+from fastapi_org.web.api.dependency import LocationParams
 
 
 def get_search_building_params(

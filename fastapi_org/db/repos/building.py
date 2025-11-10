@@ -3,14 +3,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from fastapi_org.db.models.building import Building
-
-from fastapi_org.domain.location import ShapedLocation
-
-
+from fastapi_org.domain.building import Building as DomainBuilding
 from fastapi_org.domain.building import (
-    Building as DomainBuilding,
     BuildingRepository,
 )
+from fastapi_org.domain.location import ShapedLocation
 
 
 class SQLAlchemyBuildingRepository(BuildingRepository):

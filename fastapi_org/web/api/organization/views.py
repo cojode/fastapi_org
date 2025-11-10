@@ -6,12 +6,12 @@ from fastapi_org.dependency import (
     get_search_organizations_use_case,
 )
 from fastapi_org.services.organization.base import OrganizationUseCase
+from fastapi_org.web.api.organization.dependency import get_search_org_params
 from fastapi_org.web.api.organization.schema import (
     MultipleOrganizationResponse,
     SearchOrganizationsParams,
     SingleOrganizationResponse,
 )
-from fastapi_org.web.api.organization.dependency import get_search_org_params
 
 router = APIRouter()
 

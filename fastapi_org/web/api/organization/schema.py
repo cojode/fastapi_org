@@ -3,7 +3,6 @@ from pydantic import PositiveInt
 from fastapi_org.domain.organization import (
     Organization,
 )
-
 from fastapi_org.web.api.schema import (
     GenericListResponse,
     GenericResponse,

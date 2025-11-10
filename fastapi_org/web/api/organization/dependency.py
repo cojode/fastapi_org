@@ -1,8 +1,9 @@
+from fastapi import Depends, Query
+from fastapi.exceptions import RequestValidationError
+from pydantic import ValidationError
+
 from fastapi_org.web.api.dependency import LocationParams
 from fastapi_org.web.api.organization.schema import SearchOrganizationsParams
-from pydantic import ValidationError
-from fastapi import Query, Depends
-from fastapi.exceptions import RequestValidationError
 
 
 def get_search_org_params(

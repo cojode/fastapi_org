@@ -3,13 +3,12 @@ from fastapi import APIRouter, Depends
 from fastapi_org.dependency import (
     get_search_building_use_case,
 )
-
 from fastapi_org.services.building.base import BuildingUseCase
+from fastapi_org.web.api.building.dependency import get_search_building_params
 from fastapi_org.web.api.building.schema import (
     MultipleBuildingResponse,
     SearchBuildingsParams,
 )
-from fastapi_org.web.api.building.dependency import get_search_building_params
 
 router = APIRouter()
 

@@ -2,16 +2,16 @@ from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import APIKeyHeader
 
 from fastapi_org.db.dependencies import get_db_session
-from fastapi_org.db.repos.organization import SQLAlchemyOrganizationRepository
 from fastapi_org.db.repos.building import SQLAlchemyBuildingRepository
-from fastapi_org.domain.organization import OrganizaitonRepository
+from fastapi_org.db.repos.organization import SQLAlchemyOrganizationRepository
 from fastapi_org.domain.building import BuildingRepository
+from fastapi_org.domain.organization import OrganizaitonRepository
+from fastapi_org.services.building import SearchBuildingsUseCase
+from fastapi_org.services.building.base import BuildingUseCase
 from fastapi_org.services.organization import (
     GetOrganizationByIdUseCase,
     SearchOrganizationsUseCase,
 )
-from fastapi_org.services.building import SearchBuildingsUseCase
-from fastapi_org.services.building.base import BuildingUseCase
 from fastapi_org.services.organization.base import OrganizationUseCase
 from fastapi_org.settings import settings
 
