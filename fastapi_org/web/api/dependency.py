@@ -52,7 +52,7 @@ class LocationParams:
             le=180,
             description="Second longitude corner of rectangle (degrees, -180 to 180)",
         ),
-    ):
+    ) -> None:
         self.location_shape = location_shape
         self.center_la = center_la
         self.center_lo = center_lo

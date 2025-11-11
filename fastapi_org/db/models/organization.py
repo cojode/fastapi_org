@@ -1,3 +1,5 @@
+from typing import Any
+
 from sqlalchemy import ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -25,7 +27,7 @@ class Organization(Base):
 
     phone_numbers = relationship("PhoneNumber", back_populates="organization")
 
-    def to_dict(self) -> dict:
+    def to_dict(self) -> dict[str, Any]:
         return {
             "id": self.id,
             "name": self.name,

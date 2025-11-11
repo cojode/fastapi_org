@@ -1,4 +1,6 @@
-from sqlalchemy import and_, exists, select
+from typing import Any
+
+from sqlalchemy import and_, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -17,17 +19,19 @@ class SQLAlchemyBuildingRepository(BuildingRepository):
         self.session = session
 
     async def search(
-        self, location: ShapedLocation | None = None
+        self,
+        location: ShapedLocation | None = None,
     ) -> list[DomainBuilding]:
         query = select(Building).options(
             joinedload(Building.organizations),
         )
-        conditions, query_params = [], []
+        conditions: list[Any] = []
+        query_params: dict[str, Any] = {}
 
         if location is not None:
-            location_sql, location_params = location.to_sql_params
-            conditions.append(location_sql)
-            query_params.extend(location_params)
+            location_sql, location_params = location.to_sql_params()
+            conditions.append(text(location_sql))
+            query_params |= location_params
 
         if conditions:
             query = query.where(and_(*conditions))

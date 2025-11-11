@@ -1,8 +1,9 @@
-from typing import Protocol, TypeVar, runtime_checkable
+from typing import Any, Protocol, TypeVar, runtime_checkable
 
-T = TypeVar("T", covariant=True)
+T_co = TypeVar("T_co", covariant=True)
 
 
 @runtime_checkable
-class UseCaseProtocol(Protocol[T]):
-    async def execute(self, *args, **kwargs) -> T | list[T]: ...
+class UseCaseProtocol(Protocol[T_co]):
+
+    async def execute(self, *args: Any, **kwargs: Any) -> T_co | list[T_co]: ...

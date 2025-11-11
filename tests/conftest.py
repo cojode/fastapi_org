@@ -2,7 +2,9 @@ from typing import Any, AsyncGenerator
 
 import pytest
 from fastapi import FastAPI
+from fastapi.routing import APIRoute
 from httpx import AsyncClient
+from sqlalchemy import text
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
     AsyncSession,
@@ -51,9 +53,83 @@ async def _engine() -> AsyncGenerator[AsyncEngine, None]:
         await drop_database()
 
 
+@pytest.fixture(scope="session")
+async def session_data(_engine: AsyncEngine) -> None:
+    """Fill database with test data once per session using raw SQL."""
+    async with _engine.begin() as conn:
+        await conn.execute(text("DELETE FROM organization_activity"))
+        await conn.execute(text("DELETE FROM phone_numbers"))
+        await conn.execute(text("DELETE FROM organizations"))
+        await conn.execute(text("DELETE FROM activities"))
+        await conn.execute(text("DELETE FROM buildings"))
+
+        await conn.execute(
+            text(
+                """
+            INSERT INTO buildings (id, address, latitude, longitude) VALUES
+            (1, 'Test Address 1, Moscow', 55.7558, 37.6173),
+            (2, 'Test Address 2, Moscow', 55.7559, 37.6174),
+            (3, 'Test Address 3, St. Petersburg', 59.9343, 30.3351)
+        """,
+            ),
+        )
+
+        await conn.execute(
+            text(
+                """
+            INSERT INTO activities (id, name, parent_id) VALUES
+            (1, 'Restaurant', NULL),
+            (2, 'Sports Center', NULL),
+            (3, 'Italian Cuisine', 1),
+            (4, 'Fitness', 2)
+        """,
+            ),
+        )
+
+        await conn.execute(
+            text(
+                """
+            INSERT INTO organizations (id, name, building_id) VALUES
+            (1, 'Moscow Restaurant 1', 1),
+            (2, 'Moscow Restaurant 2', 1),
+            (3, 'Moscow Sports Center', 2),
+            (4, 'Petersburg Restaurant', 3)
+        """,
+            ),
+        )
+
+        await conn.execute(
+            text(
+                """
+            INSERT INTO phone_numbers (id, organization_id, phone_number) VALUES
+            (1, 1, '+79990001111'),
+            (2, 1, '+79990002222'),
+            (3, 2, '+79990003333'),
+            (4, 3, '+79990004444'),
+            (5, 4, '+79990005555')
+        """,
+            ),
+        )
+
+        await conn.execute(
+            text(
+                """
+            INSERT INTO organization_activity (organization_id, activity_id) VALUES
+            (1, 1), (1, 3),
+            (2, 1),
+            (3, 2), (3, 4),
+            (4, 1)
+        """,
+            ),
+        )
+
+        await conn.commit()
+
+
 @pytest.fixture
 async def dbsession(
     _engine: AsyncEngine,
+    session_data: None,
 ) -> AsyncGenerator[AsyncSession, None]:
     """
     Get session to database.
@@ -62,6 +138,7 @@ async def dbsession(
     after the test completes.
 
     :param _engine: current engine.
+    :param session_data: ensures test data is loaded.
     :yields: async session.
     """
     connection = await _engine.connect()
@@ -108,3 +185,20 @@ async def client(
     """
     async with AsyncClient(app=fastapi_app, base_url="http://test", timeout=2.0) as ac:
         yield ac
+
+
+@pytest.fixture
+async def correct_api_key() -> str:
+    return settings.api_key
+
+
+@pytest.fixture
+def protected_routes(fastapi_app: FastAPI) -> list[APIRoute]:
+    unprotected_paths = {"/api/openapi.json", "/api/docs", "/api/redoc"}
+    return [
+        route
+        for route in fastapi_app.routes
+        if isinstance(route, APIRoute)
+        and route.path.startswith("/api/")
+        and route.path not in unprotected_paths
+    ]

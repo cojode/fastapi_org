@@ -1,4 +1,3 @@
-import math
 from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Protocol
@@ -10,8 +9,11 @@ class LocationShape(str, Enum):
 
 
 class ShapedLocation(Protocol):
-    @property
-    def to_sql_params(self) -> tuple[str, dict[str, Any]]: ...
+
+    def to_sql_params(
+        self,
+        building_table_alias: str = "buildings",
+    ) -> tuple[str, dict[str, Any]]: ...
 
 
 @dataclass(frozen=True)
@@ -20,27 +22,21 @@ class CircleLocation(ShapedLocation):
     center_lo: float
     radius: float
 
-    @property
-    def to_sql_params(self) -> tuple[str, dict[str, Any]]:
-        lat_margin = self.radius / 111.0
-        lon_margin = self.radius / (
-            111.0 * math.cos(math.radians(self.center_la))
-        )
-
-        sql = """
-            (b.latitude BETWEEN :min_lat AND :max_lat)
-            AND (b.longitude BETWEEN :min_lon AND :max_lon)
-            AND (
-                POW((b.latitude - :center_la) * 111.0, 2) +
-                POW((b.longitude - :center_lo) * 111.0 * COS(RADIANS(:center_la)), 2)
-            ) <= POW(:radius, 2)
+    def to_sql_params(
+        self,
+        building_table_alias: str = "buildings",
+    ) -> tuple[str, dict[str, Any]]:
+        sql = f"""
+            (6371000 * 2 * ASIN(
+            SQRT(
+            POW(SIN(RADIANS({building_table_alias}.latitude - :center_la) / 2), 2) +
+            COS(RADIANS(:center_la)) * COS(RADIANS({building_table_alias}.latitude)) *
+            POW(SIN(RADIANS({building_table_alias}.longitude - :center_lo) / 2), 2)
+            )
+            )) <= :radius
         """
 
         params = {
-            "min_lat": self.center_la - lat_margin,
-            "max_lat": self.center_la + lat_margin,
-            "min_lon": self.center_lo - lon_margin,
-            "max_lon": self.center_lo + lon_margin,
             "center_la": self.center_la,
             "center_lo": self.center_lo,
             "radius": self.radius,
@@ -56,16 +52,18 @@ class RectLocation(ShapedLocation):
     second_la: float
     second_lo: float
 
-    @property
-    def to_sql_params(self) -> tuple[str, dict[str, Any]]:
+    def to_sql_params(
+        self,
+        building_table_alias: str = "buildings",
+    ) -> tuple[str, dict[str, Any]]:
         min_la = min(self.first_la, self.second_la)
         max_la = max(self.first_la, self.second_la)
         min_lo = min(self.first_lo, self.second_lo)
         max_lo = max(self.first_lo, self.second_lo)
 
-        sql = """
-            (b.latitude BETWEEN :min_lat AND :max_lat)
-            AND (b.longitude BETWEEN :min_lon AND :max_lon)
+        sql = f"""
+            ({building_table_alias}.latitude BETWEEN :min_lat AND :max_lat)
+            AND ({building_table_alias}.longitude BETWEEN :min_lon AND :max_lon)
         """
 
         params = {

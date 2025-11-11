@@ -1,8 +1,14 @@
-from fastapi_org.services.organization.base import OrganizationUseCase
+from typing import Any
+
+from fastapi_org.services.organization.base import (
+    Organization,
+    OrganizationUseCase,
+)
 
 
 class SearchOrganizationsUseCase(OrganizationUseCase):
-    async def execute(self, *args, **kwargs):
+
+    async def execute(self, *args: Any, **kwargs: Any) -> list[Organization]:
         params = kwargs.get("params") or args[0]
 
         return await self.org_repo.search(

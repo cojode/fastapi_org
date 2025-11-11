@@ -17,6 +17,5 @@ router = APIRouter()
 async def search_building(
     params: SearchBuildingsParams = Depends(get_search_building_params),
     use_case: BuildingUseCase = Depends(get_search_building_use_case),
-):
-    print(params)
+) -> MultipleBuildingResponse:
     return MultipleBuildingResponse(values=await use_case.execute(params))

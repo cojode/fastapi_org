@@ -1,8 +1,18 @@
-from fastapi_org.services.organization.base import OrganizationUseCase
+from typing import Any
+
+from fastapi_org.services.organization.base import (
+    Organization,
+    OrganizationUseCase,
+)
 
 
 class GetOrganizationByIdUseCase(OrganizationUseCase):
-    async def execute(self, *args, **kwargs):
+
+    async def execute(
+        self,
+        *args: Any,
+        **kwargs: Any,
+    ) -> Organization | list[Organization]:
         """
         Args:
             organization_id (int): id of organization to obtain.

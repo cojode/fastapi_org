@@ -18,8 +18,6 @@ depends_on = None
 
 def upgrade() -> None:
     conn = op.get_bind()
-
-    # === Activities ===
     conn.execute(
         sa.text(
             """
@@ -37,8 +35,6 @@ def upgrade() -> None:
         """
         )
     )
-
-    # === Buildings ===
     conn.execute(
         sa.text(
             """
@@ -51,8 +47,6 @@ def upgrade() -> None:
         """
         )
     )
-
-    # === Organizations ===
     conn.execute(
         sa.text(
             """
@@ -70,8 +64,6 @@ def upgrade() -> None:
         """
         )
     )
-
-    # === Organization-Activity mapping ===
     conn.execute(
         sa.text(
             """
@@ -88,8 +80,6 @@ def upgrade() -> None:
         """
         )
     )
-
-    # === Phone Numbers ===
     conn.execute(
         sa.text(
             """

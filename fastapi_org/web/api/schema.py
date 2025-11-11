@@ -1,4 +1,5 @@
 from dataclasses import fields
+from typing import Any
 
 from pydantic import (
     BaseModel,
@@ -32,7 +33,7 @@ class GenericResponse[T](GenericResponseMessageField):
 
     @field_validator("data", mode="before")
     @classmethod
-    def convert_to_single_value(cls, v) -> T | None:
+    def convert_to_single_value(cls, v: Any) -> T | None:
         if isinstance(v, list):
             if len(v) == 0:
                 return None
@@ -45,7 +46,7 @@ class GenericResponse[T](GenericResponseMessageField):
 
     @field_validator("data", mode="after")
     @classmethod
-    def auto_404(cls, v):
+    def auto_404(cls, v: Any) -> Any:
         if v is None:
             raise NotFoundError
         return v
@@ -57,7 +58,7 @@ class GenericListResponse[T](GenericResponseMessageField):
 
     @field_validator("values", mode="before")
     @classmethod
-    def convert_to_list(cls, v) -> list[T]:
+    def convert_to_list(cls, v: Any) -> list[T]:
         if v is None:
             return []
         if not isinstance(v, list):
@@ -80,15 +81,17 @@ class WithLocationParams(BaseModel):
     location: SupportedShapedLocations | None = Field(default=None, init=False)
 
     @model_validator(mode="after")
-    def build_location(self):
-        def obtain_location(location_type: type):
+    def build_location(self) -> "WithLocationParams":
+
+        def obtain_location(location_type: type) -> Any:
             required_keys = [f.name for f in fields(location_type)]
             values = {key: getattr(self, key) for key in required_keys}
 
             if not all(values.values()):
                 raise PydanticCustomError(
                     "missing_shape_fields",
-                    "For shape [{location_shape}] you must provide all of: {required_keys}. Missing: {missing}",
+                    "For shape [{location_shape}] you must provide"
+                    " all of: {required_keys}. Missing: {missing}",
                     {
                         "location_shape": self.location_shape,
                         "required_keys": required_keys,
@@ -105,7 +108,5 @@ class WithLocationParams(BaseModel):
             case None:
                 ...
             case _:
-                raise ValueError(
-                    f"Unknown location shape: {self.location_shape}"
-                )
+                raise ValueError(f"Unknown location shape: {self.location_shape}")
         return self

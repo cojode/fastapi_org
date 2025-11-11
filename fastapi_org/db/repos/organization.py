@@ -1,4 +1,6 @@
-from sqlalchemy import and_, exists, select
+from typing import Any
+
+from sqlalchemy import and_, exists, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
@@ -7,11 +9,9 @@ from fastapi_org.db.models.organization import Organization
 from fastapi_org.db.models.organization_activity import OrganizationActivity
 from fastapi_org.domain.organization import (
     OrganizaitonRepository,
-)
-from fastapi_org.domain.organization import Organization as DomainOrganization
-from fastapi_org.domain.organization import (
     ShapedLocation,
 )
+from fastapi_org.domain.organization import Organization as DomainOrganization
 
 
 class SQLAlchemyOrganizationRepository(OrganizaitonRepository):
@@ -20,9 +20,7 @@ class SQLAlchemyOrganizationRepository(OrganizaitonRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def get_by_id(
-        self, organization_id: int
-    ) -> DomainOrganization | None:
+    async def get_by_id(self, organization_id: int) -> DomainOrganization | None:
         stmt = (
             select(Organization)
             .options(
@@ -50,12 +48,11 @@ class SQLAlchemyOrganizationRepository(OrganizaitonRepository):
             joinedload(Organization.phone_numbers),
         )
 
-        conditions, query_params = [], []
+        conditions: list[Any] = []
+        query_params: dict[str, Any] = {}
 
         if organization_name:
-            conditions.append(
-                Organization.name.ilike(f"%{organization_name}%")
-            )
+            conditions.append(Organization.name.ilike(f"%{organization_name}%"))
 
         if building_id is not None:
             conditions.append(Organization.building_id == building_id)
@@ -83,9 +80,7 @@ class SQLAlchemyOrganizationRepository(OrganizaitonRepository):
                         (
                             select(activity_tree.c.id)
                             if recursive_activity
-                            else select(Activity.id).where(
-                                Activity.id == activity_id
-                            )
+                            else select(Activity.id).where(Activity.id == activity_id)
                         ),
                     ),
                 )
@@ -94,9 +89,11 @@ class SQLAlchemyOrganizationRepository(OrganizaitonRepository):
             conditions.append(activity_filter)
 
         if location is not None:
-            location_sql, location_params = location.to_sql_params
-            conditions.append(location_sql)
-            query_params.extend(location_params)
+            location_sql, location_params = location.to_sql_params(
+                building_table_alias="buildings_1",
+            )
+            conditions.append(text(location_sql))
+            query_params |= location_params
 
         if conditions:
             query = query.where(and_(*conditions))

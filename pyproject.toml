@@ -54,6 +54,10 @@ allow_untyped_decorators = true
 warn_unused_ignores = false
 warn_return_any = false
 namespace_packages = true
+exclude = [
+    "tests/",
+    ".*/test_.*\\.py",
+]
 
 [tool.pytest.ini_options]
 filterwarnings = [
@@ -76,7 +80,7 @@ lint.select = [
     "C90", # McCabe complexity
     "I",   # Isort
     "N",   # pep8-naming
-    "D",   # Pydocstyle
+    # "D",   # Pydocstyle
     "ANN", # Pytype annotations
     "S",   # Bandit
     "B",   # Bugbear

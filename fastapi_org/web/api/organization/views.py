@@ -20,15 +20,13 @@ router = APIRouter()
 async def search_org(
     params: SearchOrganizationsParams = Depends(get_search_org_params),
     use_case: OrganizationUseCase = Depends(get_search_organizations_use_case),
-):
+) -> MultipleOrganizationResponse:
     return MultipleOrganizationResponse(values=await use_case.execute(params))
 
 
 @router.get("/{id}", response_model=SingleOrganizationResponse)
 async def get_org_by_id(
     id: PositiveInt,
-    use_case: OrganizationUseCase = Depends(
-        get_get_organization_by_id_use_case
-    ),
-):
+    use_case: OrganizationUseCase = Depends(get_get_organization_by_id_use_case),
+) -> SingleOrganizationResponse:
     return SingleOrganizationResponse(data=await use_case.execute(id))
